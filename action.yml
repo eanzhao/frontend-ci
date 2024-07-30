@@ -13,6 +13,10 @@ inputs:
     description: 'Is monorepo'
     required: false
     default: false
+  package:
+    description: 'Package name'
+    required: false
+    default: 'utils'
 
 permissions:
   contents: write
@@ -20,9 +24,6 @@ permissions:
 
 runs:
   using: 'composite'
-  strategy:
-    matrix:
-      package: [utils]
   steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -45,7 +46,7 @@ runs:
     - name: Run tests
       run: |
         if [[ "${{ inputs.is-monorepo }}" == "true" ]]; then
-          cd packages/${{ matrix.package }}
+          cd packages/${{ inputs.package }}
           pnpm run test
         else
           yarn run test
@@ -61,9 +62,9 @@ runs:
     - name: Extract test counts
       run: |
         if [[ "${{ inputs.is-monorepo }}" == "true" ]]; then
-          echo "TESTS=$(xmlstarlet sel -t -v "testsuites/@tests" "packages/${{ matrix.package }}/jest-report.xml")" >> $GITHUB_ENV
-          echo "FAILURES=$(xmlstarlet sel -t -v "testsuites/@failures" "packages/${{ matrix.package }}/jest-report.xml")" >> $GITHUB_ENV
-          echo "ERRORS=$(xmlstarlet sel -t -v "testsuites/@errors" "packages/${{ matrix.package }}/jest-report.xml")" >> $GITHUB_ENV
+          echo "TESTS=$(xmlstarlet sel -t -v "testsuites/@tests" "packages/${{ inputs.package }}/jest-report.xml")" >> $GITHUB_ENV
+          echo "FAILURES=$(xmlstarlet sel -t -v "testsuites/@failures" "packages/${{ inputs.package }}/jest-report.xml")" >> $GITHUB_ENV
+          echo "ERRORS=$(xmlstarlet sel -t -v "testsuites/@errors" "packages/${{ inputs.package }}/jest-report.xml")" >> $GITHUB_ENV
         else
           echo "TESTS=$(xmlstarlet sel -t -v "testsuites/@tests" "jest-report.xml")" >> $GITHUB_ENV
           echo "FAILURES=$(xmlstarlet sel -t -v "testsuites/@failures" "jest-report.xml")" >> $GITHUB_ENV
