@@ -73,7 +73,7 @@ runs:
       shell: bash
 
     - name: Set file name
-      run: echo "FILENAME=$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-')-test-results.json" >> $GITHUB_ENV
+      run: echo "FILENAME=$(echo ${GITHUB_REF#refs/heads/} | tr '/' '-')-${{ inputs.package }}-test-results.json" >> $GITHUB_ENV
       shell: bash
 
     - name: Prepare Content
